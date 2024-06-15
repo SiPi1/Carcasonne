@@ -21,7 +21,7 @@ public class Carcassonne {
         Board board = new Board();
         Deck deck = new Deck();
         LinkedList<Player> competitors = getPlayers(in);
-        Player winner = null;
+        Player winner;
         Tile tile;
         Player p;
 
@@ -38,9 +38,9 @@ public class Carcassonne {
             addedMeeples = 0;
 
             System.out.println(p.getName() + "'s turn!\n"
-                    + board.toString()
+                    + board
                     + tile.getKey()
-                    + "\nYour tile: \n" + tile.toString());
+                    + "\nYour tile: \n" + tile);
 
             while (temp == 0) { //while loop to reset tile placement
                 p.setMeeples(addedMeeples);
@@ -56,26 +56,30 @@ public class Carcassonne {
                     temp = in.nextInt();
                 }
             }
-            System.out.println(board.toString());
+            System.out.println(board);
 
             scores.score(board.score());
             for (Player pl: competitors) {
-                if (board.meeplesBack().size() > pl.getNumber() - 1) pl.setMeeples(board.meeplesBack().get(pl.getNumber() - 1));
+                if (board.meeplesBack().size() > pl.getNumber() - 1) 
+                    pl.setMeeples(board.meeplesBack().get(pl.getNumber() - 1));
             }
-            System.out.print("Your turn is over. " + scores.toString());
+            System.out.print("Your turn is over. " + scores);
         }
+
+        //GAME END
         scores.score(board.scoreAll());
         winner = competitors.get(0);
-        temp = scores.getScore(0);
-        for (int i = 1; i < competitors.size(); i++) {
-            if (scores.getScore(i) > temp) {
-                temp = scores.getScore(i);
-                winner = competitors.get(i);
-            }
+        for (Player player: competitors) {
+            if (scores.getScore(player.getNumber()) > scores.getScore(winner.getNumber())
+                || scores.getScore(player.getNumber()) == scores.getScore(winner.getNumber())
+
+                    && player.getMeeples() > winner.getMeeples()
+                || player.getMeeples() == winner.getMeeples()
+
+                    && player.getNumber() > winner.getNumber()) 
+                winner = player;
         }
-        System.out.println("Congratulations " + winner.getName()
-                + ", you won! The final board state and scores are as follows: " + "\n" + scores.toString()
-                + "\n" + board.toString());
+        System.out.println(board + "\n" + scores + "Congratulations " + winner.getName() + ", you won!");
         in.close();
     }
 
@@ -102,7 +106,7 @@ public class Carcassonne {
             temp = in.nextInt();
         }
         tile.rotate(temp);
-        System.out.println(tile.toString());
+        System.out.println(tile);
     }
 
     private static int addMeeple(Scanner in, Tile tile, Player player) {

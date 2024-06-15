@@ -67,10 +67,4 @@
      public boolean empty() {
          return deck.size() == 0;
      }
-     
-     public void checkPrint() {
-         for (Tile t: deck) {
-             System.out.println(t);
-         }
-     }
  }

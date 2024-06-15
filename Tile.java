@@ -111,80 +111,77 @@ public class Tile implements Cloneable
         switch (line) {
             case 0:
             char t, t1, l1;
-            if (sides[0] == -1) {
+            if (sides[0] == -1)
                 t = '-';
-            }
-            else if (sides[0] % 2 == 0) {
+            else if (sides[0] % 2 == 0) 
                 t = '\u2016';
-            }
             else {
                 if (cityConnects) t = 'U';
                 else t = 'V';
             }
-            if (sides[0] / 2 < 1){
+
+            if (sides[0] / 2 < 1)
                 t1 = '-';
-            }
-            else {
+            else 
                 t1 = (char)('0' + (sides[0] / 2));
-            }
-            if (sides[1] / 2 < 1){
+
+            if (sides[1] / 2 < 1)
                 l1 = '/';
-            }
-            else {
+            else 
                 l1 = (char)('0' + (sides[1] / 2));
-            }
+
             ln += l1 + "-" + t + "" + t1 + "\\";
             break;
+
+
             case 1:
             char r, m, m1, f, l;
-            if (sides[3] == -1) {
+            if (sides[3] == -1) 
                 r = '|';
-            }
-            else if (sides[3] % 2 == 0) {
+            else if (sides[3] % 2 == 0) 
                 r = '=';
-            }
             else {
                 if (cityConnects) r = '(';
                 else r = '<';
             }
-            if (sides[1] == -1) {
+
+            if (sides[1] == -1) 
                 l = '|';
-            }
-            else if (sides[1] % 2 == 0) {
+            else if (sides[1] % 2 == 0) 
                 l = '=';
-            }
             else {
                 if (cityConnects) l = ')';
                 else l = '>';
             }
-            if (fortified){
+
+            if (fortified)
                 f = 'F';
-            }
-            else {
+            else 
                 f = ' ';
-            }
-            if (monastery > -1){
+
+            if (monastery > -1)
                 m = 'M';
-            }
-            else {
+            else if (!roadConnects || !cityConnects) 
+                m = 'X';
+            else 
                 m = ' ';
-            }
-            if (monastery > 0){
+
+            if (monastery > 0)
                 m1 = (char)('0' + monastery);
-            }
-            else {
+            else 
                 m1 = ' ';
-            }
+
             ln += "" + l + "" + f + "" + m + "" + m1 + "" + r;
             break;
+
+
             case 2:
             char d, d1, r1;
-            if (sides[2] == -1) {
+
+            if (sides[2] == -1) 
                 d = '-';
-            }
-            else if (sides[2] % 2 == 0) {
+            else if (sides[2] % 2 == 0) 
                 d = '\u2016';
-            }
             else {
                 if (cityConnects) d = '\u2229';
                 else d = '\u039B';
@@ -192,15 +189,14 @@ public class Tile implements Cloneable
             if (sides[2] / 2 < 1){
                 d1 = '-';
             }
-            else {
+
+            else 
                 d1 = (char)('0' + (sides[2] / 2));
-            }
-            if (sides[3] / 2 < 1){
+            if (sides[3] / 2 < 1)
                 r1 = '/';
-            }
-            else {
+            else 
                 r1 = (char)('0' + (sides[3] / 2));
-            }
+                
             ln += "\\" + d1 + d + "-" + r1;
         }
         return ln;
