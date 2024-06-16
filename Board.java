@@ -55,15 +55,6 @@ public class Board {
         return true;
     }
 
-    private boolean contains(ArrayList<Tile> element, Tile t) {
-        for (Tile tile: element) {
-            if(tile == t) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public ArrayList<Tile> elementAt(int x, int y, int side) {
         if (!exists(x, y)) return new ArrayList<Tile>();
         if (board.get(x).get(y).getSideType(side) == GRASS) {
@@ -111,7 +102,7 @@ public class Board {
             return elementAt(x1, y1, (side + 2) % 4, remainder);
         }
 
-        if (contains(remainder, board.get(x).get(y))) return remainder;
+        if (remainder.contains(board.get(x).get(y))) return remainder;
         remainder.add(board.get(x).get(y));
 
         for (int i = 0; i < 4; i++) {
@@ -145,6 +136,8 @@ public class Board {
         int x = 0;
         int y = 0;
         int pos = 0;
+        boolean[] check = {false, false};//check roads or cities -- fixes meeples on different sides
+
         //finds the xy of 'position'
         for (x = 0; x < board.size() && pos != position; x++) {
             for (y = 0; y < board.get(0).size() && pos != position; y++) {
@@ -158,6 +151,12 @@ public class Board {
         lastX = x;
         lastY = y;
         
+        if (tile.getCityConnect() || tile.getRoadConnect()) {
+            for (int i = 0; i < 4; i++) {
+                if (tile.getSideColor(i) >= 0) 
+                    check[tile.getSideType(i)] = true;
+            }
+        }
         for (int i = 0; i < 4; i++) {
             int x1, y1;
             switch(i) {
@@ -177,7 +176,7 @@ public class Board {
                     return i + 1;
                 }//side type mismatch
 
-                if (tile.getSideColor(i) != 0) {
+                if (tile.getSide(i) > 1 && check[tile.getSideType(i)]) {
                     for (Tile t: elementAt(x1, y1, (i + 2) % 4)) {
                         if (!t.getCityConnect() || !t.getRoadConnect()) {
                             int j;
@@ -199,8 +198,8 @@ public class Board {
                         }
                     }
                 }
-            }
-        }
+            }// end exists
+        }// end for each side
 
         //place the tile
         board.get(x).set(y, tile);

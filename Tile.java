@@ -93,14 +93,15 @@ public class Tile implements Cloneable
     }
     
     public String getKey(){
-        return "/-----------------------------\\\n" +
-               "| =," + '\u2016' + "                   roads |\n" +
-               "| U,)," + '\u2229' + ",(   connected castles |\n" +
-               "| V,>," + '\u039B' + ",< unconnected castles |\n" +
-               "| M                 monastery |\n" +
-               "| F                 fortified |\n" +
-               "| 1,2,3,4,5  player # meeples |\n" +
-               "\\-----------------------------/";
+        char c = 9553;
+        return " --------------------------- \n" +
+               "| =,"+c+"                 roads |\n" + //u2016
+               "| U,),∩,(           castles |\n" + //u2229
+               "| X          no connections |\n" + //u039B 
+               "| M               monastery |\n" +
+               "| F               fortified |\n" +
+               "| 1,2,3,4  player # meeples |\n" +
+               " --------------------------- ";
     }
     
     public String toString(int line){
@@ -112,25 +113,23 @@ public class Tile implements Cloneable
             case 0:
             char t, t1, l1;
             if (sides[0] == -1)
-                t = '-';
+                t = ' ';
             else if (sides[0] % 2 == 0) 
-                t = '\u2016';
-            else {
-                if (cityConnects) t = 'U';
-                else t = 'V';
-            }
+                t = 9553;
+            else 
+                t = 'U';
 
             if (sides[0] / 2 < 1)
-                t1 = '-';
+                t1 = ' ';
             else 
                 t1 = (char)('0' + (sides[0] / 2));
 
             if (sides[1] / 2 < 1)
-                l1 = '/';
+                l1 = '·';
             else 
                 l1 = (char)('0' + (sides[1] / 2));
 
-            ln += l1 + "-" + t + "" + t1 + "\\";
+            ln += l1 + " " + t + "" + t1 + "|";
             break;
 
 
@@ -140,19 +139,15 @@ public class Tile implements Cloneable
                 r = '|';
             else if (sides[3] % 2 == 0) 
                 r = '=';
-            else {
-                if (cityConnects) r = '(';
-                else r = '<';
-            }
+            else
+                r = '(';
 
             if (sides[1] == -1) 
-                l = '|';
-            else if (sides[1] % 2 == 0) 
+                l = ' ';
+            else if (sides[1] % 2 == 0)
                 l = '=';
-            else {
-                if (cityConnects) l = ')';
-                else l = '>';
-            }
+            else 
+                l = ')';
 
             if (fortified)
                 f = 'F';
@@ -181,23 +176,19 @@ public class Tile implements Cloneable
             if (sides[2] == -1) 
                 d = '-';
             else if (sides[2] % 2 == 0) 
-                d = '\u2016';
-            else {
-                if (cityConnects) d = '\u2229';
-                else d = '\u039B';
-            }
-            if (sides[2] / 2 < 1){
+                d = 9553;
+            else 
+                d = '∩';
+            if (sides[2] / 2 < 1)
                 d1 = '-';
-            }
 
             else 
                 d1 = (char)('0' + (sides[2] / 2));
             if (sides[3] / 2 < 1)
-                r1 = '/';
+                r1 = '-';
             else 
                 r1 = (char)('0' + (sides[3] / 2));
-                
-            ln += "\\" + d1 + d + "-" + r1;
+            ln += " " + d1 + d + "-" + r1;
         }
         return ln;
     }

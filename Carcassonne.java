@@ -4,14 +4,20 @@
 *
 * @author Miles
 * @version 6/5/24
-* 
-* TODO: placing meeples does funny shapes?? sometimes???
-*   placement color checking needs to be better
-*   move restart turn to placement (0)
+* TODO: Add a new Scanner function with utilities: Highlight meeples, highlight element, save, etc. 
 */
 import java.util.*;
 
 public class Carcassonne {
+    public static void actiiTable() {
+        int width = 5;
+        for (int i = 0; i < 10000; i += width) {
+            for (int j = 0; j < width; j++) {
+                if ((char)(i + j) != '?') System.out.print("\t" + (i + j) + " : " + (char)(i + j));
+            }
+            System.out.println();
+        }
+    }
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
 
@@ -20,33 +26,38 @@ public class Carcassonne {
         // GAME VARIABLES
         Board board = new Board();
         Deck deck = new Deck();
-        LinkedList<Player> competitors = getPlayers(in);
+        ArrayList<Player> competitors = getPlayers(in);
         Player winner;
         Tile tile;
         Player p;
 
         // LOOP VARIABLES
-        int temp = 0;
+        int temp;
         int addedMeeples;
 
         // GAME LOOP
         Scoreboard scores = new Scoreboard(competitors);
         while (!deck.empty()) {
+            temp = 0;
             tile = deck.draw();
-            p = competitors.pop();
-            competitors.push(p);
+            p = competitors.remove(0);
+            competitors.add(p);
             addedMeeples = 0;
 
-            System.out.println(p.getName() + "'s turn!\n"
+            System.out.println("\n\nPlayer " + p.getNumber() + ": " + p.getName() + "'s turn!\n"
                     + board
                     + tile.getKey()
                     + "\nYour tile: \n" + tile);
 
             while (temp == 0) { //while loop to reset tile placement
                 p.setMeeples(addedMeeples);
-                rotate(in, tile);
+                for (int i = 0; i < 4; i++) tile.setSideColor(i, 0);
 
-                addedMeeples = addMeeple(in, tile, p);
+                rotate(in, tile);
+                System.out.println(tile);
+
+                addedMeeples = addMeeple(in, tile, p);//TODO: Move after placing??
+                System.out.println(tile);
 
                 System.out.println("Where would you like to place your tile?");
                 temp = in.nextInt();
@@ -83,17 +94,17 @@ public class Carcassonne {
         in.close();
     }
 
-    private static LinkedList<Player> getPlayers(Scanner in) {
+    private static ArrayList<Player> getPlayers(Scanner in) {
         String name = " ";
-        LinkedList<Player> players = new LinkedList<Player>();
+        ArrayList<Player> players = new ArrayList<Player>();
 
         System.out.println("Enter your names, [enter] to finish:");
-        for (int i = 0; !name.equals(""); i++) {
+        for (int i = 0; i < 2 || !name.equals(""); i++) {
             System.out.print("Player " + (i + 1) + ": ");
             name = in.nextLine();
-            players.add(new Player(name));
+            if (name.equals("")) i--;
+            else players.add(new Player(name));
         }
-        players.pollLast();
         return players;
     }
 
@@ -106,12 +117,11 @@ public class Carcassonne {
             temp = in.nextInt();
         }
         tile.rotate(temp);
-        System.out.println(tile);
     }
 
     private static int addMeeple(Scanner in, Tile tile, Player player) {
         int side;
-        System.out.print("Claim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
+        System.out.print("You have " + player.getMeeples() + " meeples.\nClaim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
         side = in.nextInt() - 1;
         while (!checkMeeple(side, tile).equals("")) {
             System.out.print(checkMeeple(side, tile));
@@ -134,11 +144,11 @@ public class Carcassonne {
 
         if (side < -1 || side > 3)
             return "Please input between 0-4.";
-        if (tile.getSide(side) == -1) {
+        if (side > -1 && tile.getSide(side) == -1) {
             if (tile.getMonastery() == 0)
                 return "";
             else
-                return "Do not place your Meeple on grass.";
+                return "Sorry, we don't do farmers...";
         }
         return "";
     }
@@ -160,8 +170,10 @@ public class Carcassonne {
                 return error + "bottom.";
             case 3:
                 return error + "right.";
+            default:
+                return error + (errorCode - 1 % 4);
         }
 
-        return "Unrecognized error: " + errorCode;
+        //return "Unrecognized error: " + errorCode;
     }
 }
