@@ -9,12 +9,22 @@ public class Scoreboard
 {
     private ArrayList<Integer> scores;
     private ArrayList<String> names;
-    public Scoreboard (Collection<Player> n) {
+    public Scoreboard (ArrayList<Player> n) {
         scores = new ArrayList<Integer>();
         names = new ArrayList<String>();
         for (Player p: n) {
             scores.add(0);
             names.add(p.getName());
+        }
+    }
+
+    public Scoreboard (String save) {
+        scores = new ArrayList<Integer>();
+        names = new ArrayList<String>();
+        while (!save.equals("")) {
+            names.add(save.substring(0, save.indexOf('=')));
+            scores.add(Integer.parseInt(  save.substring( save.indexOf('=') + 1, save.indexOf(';') )  ));
+            save = save.substring(save.indexOf(';') + 1);
         }
     }
 
@@ -36,5 +46,17 @@ public class Scoreboard
     
     public int getScore (int n) {
         return scores.get(n);
+    }
+
+    public ArrayList<String> getPlayers() {
+        return names;//do we need this?
+    }
+
+    public String save() {
+        String save = "";
+        for (int i = 0; i < names.size(); i++) {
+            save += names.get(i) + "=" + scores.get(i) + ";";
+        }
+        return save;
     }
 }

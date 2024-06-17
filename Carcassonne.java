@@ -4,12 +4,11 @@
 *
 * @author Miles
 * @version 6/5/24
-* TODO: Add a new Scanner function with utilities: Highlight meeples, highlight element, save, etc. 
 */
 import java.util.*;
 
 public class Carcassonne {
-    public static void actiiTable() {
+    public static void asciiTable() {
         int width = 5;
         for (int i = 0; i < 10000; i += width) {
             for (int j = 0; j < width; j++) {
@@ -19,24 +18,58 @@ public class Carcassonne {
         }
     }
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
 
-        System.out.println("WELCOME TO CARCASONNE!");
-
-        // GAME VARIABLES
-        Board board = new Board();
-        Deck deck = new Deck();
-        ArrayList<Player> competitors = getPlayers(in);
+        Input in = new Input();
+        Board board;
+        Deck deck;
+        Scoreboard scores;
+        ArrayList<Player> competitors;
         Player winner;
-        Tile tile;
-        Player p;
+        String userIn;
+        
+        System.out.println("WELCOME TO CARCASONNE! \nPlay from save? ");
+        userIn = in.nextLine();
+        if (!userIn.equals("")) {
+            board = new Board(userIn.substring(userIn.indexOf('|') + 1));
+            deck = new Deck(board);
+            scores = new Scoreboard(userIn.substring(0, userIn.indexOf('|')));
+            competitors = new ArrayList<Player>();
+            for (String name: scores.getPlayers()) {
+                competitors.add(new Player(name));
+            }
+
+            ArrayList<Tile> allTiles = board.tiles();
+            // assign meeples to players
+            for (Tile t: allTiles) {
+                for (int i = 0; i < 4; i++) {
+                    if (t.getSideColor(i) > 0)
+                        competitors.get(t.getSideColor(i) - 1).setMeeples(-1);
+                }
+                if (t.getMonastery() > 0)
+                    competitors.get(t.getMonastery() - 1).setMeeples(-1);
+                
+            }
+
+            // resolve turn order
+            for (int i = 0; i < (allTiles.size() - 1) % competitors.size(); i++) {
+                competitors.add(competitors.remove(0));
+            }
+        }
+        else {
+            board = new Board();
+            deck = new Deck();
+            competitors = getPlayers(in);
+            scores = new Scoreboard(competitors);
+        }
+        in = new Input(board, scores);
 
         // LOOP VARIABLES
         int temp;
         int addedMeeples;
+        Tile tile;
+        Player p;
 
         // GAME LOOP
-        Scoreboard scores = new Scoreboard(competitors);
         while (!deck.empty()) {
             temp = 0;
             tile = deck.draw();
@@ -91,10 +124,9 @@ public class Carcassonne {
                 winner = player;
         }
         System.out.println(board + "\n" + scores + "Congratulations " + winner.getName() + ", you won!");
-        in.close();
     }
 
-    private static ArrayList<Player> getPlayers(Scanner in) {
+    private static ArrayList<Player> getPlayers(Input in) {
         String name = " ";
         ArrayList<Player> players = new ArrayList<Player>();
 
@@ -103,12 +135,16 @@ public class Carcassonne {
             System.out.print("Player " + (i + 1) + ": ");
             name = in.nextLine();
             if (name.equals("")) i--;
+            else if (name.indexOf('|') != -1 || name.indexOf('=') != -1 || name.indexOf(';') != -1) {
+                System.out.println("Names can't contain =, |, or ;");
+                i--;
+            }
             else players.add(new Player(name));
         }
         return players;
     }
 
-    private static void rotate(Scanner in, Tile tile) {
+    private static void rotate(Input in, Tile tile) {
         int temp;
         System.out.print("ROTATE TILE -- 0:0 deg, 1:90 deg, 2:180 deg, 3: 270 deg: ");
         temp = in.nextInt();
@@ -119,7 +155,7 @@ public class Carcassonne {
         tile.rotate(temp);
     }
 
-    private static int addMeeple(Scanner in, Tile tile, Player player) {
+    private static int addMeeple(Input in, Tile tile, Player player) {
         int side;
         System.out.print("You have " + player.getMeeples() + " meeples.\nClaim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
         side = in.nextInt() - 1;

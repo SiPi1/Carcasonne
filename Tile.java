@@ -27,9 +27,11 @@ public class Tile implements Cloneable
         sides[1] = l;
         sides[2] = d;
         sides[3] = r;
+
         cityConnects = cc;
         fortified = f;
         monastery = m;
+
         int roads = 0;
         for (int i: sides) {
             if (i == 0) roads++;
@@ -37,6 +39,40 @@ public class Tile implements Cloneable
         roadConnects = roads < 3;
         //robert be like roadConnects = ((t == 0 && r == 0 && d != 0 && l != 0) || (t != 0 && r == 0 && d == 0 && l != 0) || (t != 0 && r != 0 && d == 0 && l == 0) || (t == 0 && r != 0 && d != 0 && l == 0) || (t == 0 && r != 0 && d == 0 && l != 0) || (t != 0 && r == 0 && d != 0 && l == 0));
     }//constructs a tile with specified values
+
+    public Tile(String save) {
+        this();
+        for (int i = 0; i < 4 && save.length() > 1; i++) {
+            try {sides[i] = Integer.parseInt(save.substring(0, 2));}
+            catch(NumberFormatException e) {
+                System.out.println("ERROR: " + save);
+            }
+            save = save.substring(2);
+        }
+        
+        cityConnects = true;
+        if (save.length() > 0)
+        switch (save.charAt(0)) {
+        case 'X':
+            cityConnects = false;
+            break;
+        case 'M':
+            monastery = Integer.parseInt(save.substring(1, 2));
+            break;
+        case 'F':
+            fortified = true;
+            break;
+        case ';': break;//no special conditions
+        case '0': break;//empty tile
+        default: System.out.println("TILE PARSE ERROR: " + save);
+        }
+
+        int roads = 0;
+        for (int i: sides) {
+            if (i == 0) roads++;
+        }
+        roadConnects = roads < 3;
+    }
 
     public int getSide(int side){
         if (side < 4) return sides[side];
@@ -111,7 +147,8 @@ public class Tile implements Cloneable
         }
         switch (line) {
             case 0:
-            char t, t1, l1;
+            char t;
+            String t1, l1;
             if (sides[0] == -1)
                 t = ' ';
             else if (sides[0] % 2 == 0) 
@@ -120,21 +157,22 @@ public class Tile implements Cloneable
                 t = 'U';
 
             if (sides[0] / 2 < 1)
-                t1 = ' ';
+                t1 = " ";
             else 
-                t1 = (char)('0' + (sides[0] / 2));
+                t1 = "\u001B[" + (30 + getSideColor(0)) + "m" + getSideColor(0) + "\u001B[0m";
 
             if (sides[1] / 2 < 1)
-                l1 = '·';
+                l1 = "·";
             else 
-                l1 = (char)('0' + (sides[1] / 2));
+                l1 = "\u001B[" + (30 + getSideColor(1)) + "m" + getSideColor(1) + "\u001B[0m";;
 
             ln += l1 + " " + t + "" + t1 + "|";
             break;
 
 
             case 1:
-            char r, m, m1, f, l;
+            char r, m, f, l;
+            String m1;
             if (sides[3] == -1) 
                 r = '|';
             else if (sides[3] % 2 == 0) 
@@ -162,16 +200,17 @@ public class Tile implements Cloneable
                 m = ' ';
 
             if (monastery > 0)
-                m1 = (char)('0' + monastery);
+                m1 = "\u001B[" + (30 + monastery) + "m" +  monastery + "\u001B[0m";
             else 
-                m1 = ' ';
+                m1 = " ";
 
             ln += "" + l + "" + f + "" + m + "" + m1 + "" + r;
             break;
 
 
             case 2:
-            char d, d1, r1;
+            char d;
+            String d1, r1;
 
             if (sides[2] == -1) 
                 d = '-';
@@ -180,14 +219,14 @@ public class Tile implements Cloneable
             else 
                 d = '∩';
             if (sides[2] / 2 < 1)
-                d1 = '-';
+                d1 = "-";
 
             else 
-                d1 = (char)('0' + (sides[2] / 2));
+                d1 = "\u001B[" + (30 + getSideColor(2)) + "m" + getSideColor(2) + "\u001B[0m";
             if (sides[3] / 2 < 1)
-                r1 = '-';
+                r1 = "-";
             else 
-                r1 = (char)('0' + (sides[3] / 2));
+                r1 = "\u001B[" + (30 + getSideColor(3)) + "m" + getSideColor(3) + "\u001B[0m";
             ln += " " + d1 + d + "-" + r1;
         }
         return ln;
@@ -195,5 +234,18 @@ public class Tile implements Cloneable
     
     public String toString(){
         return toString(0) + "\n" + toString(1) + "\n" + toString(2) + "\n";
+    }
+
+    public String save() {
+        if (sides[0] == -2) return "00";
+        String save = "";
+        for (int i: sides) {
+            if (i < 10 && i >= 0) save += '0';
+            save += i;
+        }
+        if (!cityConnects) save += 'X';
+        if (monastery > -1) save += "M" + monastery;
+        if (fortified) save += 'F';
+        return save;
     }
 }

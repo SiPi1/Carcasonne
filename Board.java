@@ -33,8 +33,35 @@ public class Board {
         lastY = 1;
     }
 
-    public Tile tileAt(int x, int y) {
-        return board.get(y).get(x);
+    public Board(String save) {
+        board = new ArrayList<ArrayList<Tile>>();
+        lastX = 1;
+        lastY = 0;//points to empty tile: Should make all functions involving it not work, but not crash
+        String rowSave;
+        while (!save.equals("")) {
+            rowSave = save.substring(0, save.indexOf('\\'));
+            board.add(new ArrayList<Tile>());
+            while (!rowSave.equals("")) {
+                if (rowSave.indexOf(';') == 0) board.get(board.size() - 1).add(null);
+                else board.get(board.size() - 1).add(
+                    new Tile(rowSave.substring(0, rowSave.indexOf(';')))
+                );
+                rowSave = rowSave.substring(rowSave.indexOf(';') + 1);
+            }
+            save = save.substring(save.indexOf('\\') + 1);
+        }
+    }
+
+    public ArrayList<Tile> tiles() {
+        ArrayList<Tile> allTiles = new ArrayList<Tile>();
+
+        for (ArrayList<Tile> row: board) 
+            for (Tile t: row) 
+
+                if (t != null && t.getSide(0) != -2)
+                    allTiles.add(t);
+        
+        return allTiles;
     }
 
     private boolean exists(int x, int y) {
@@ -445,5 +472,19 @@ public class Board {
             }//end every line
         }//end every row of tiles
         return boardStr;
+    }
+
+    public String save() {
+        String save = "";
+        for (ArrayList<Tile> row: board) {
+            for (Tile t: row) {
+                if (t != null) {
+                    save += t.save();
+                }
+                save += ";";
+            }
+            save += "\\";
+        }
+        return save;
     }
 }

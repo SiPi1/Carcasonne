@@ -59,6 +59,14 @@
              }
          }
      }
+
+    public Deck(Board b) {
+        this();
+        deck.add(new Tile(CITY, ROAD, GRASS, ROAD, true, false, -1));//account for start tile
+        for (Tile t: b.tiles()) {
+            deck.remove(t);
+        }
+    }
      
      public Tile draw() {
          return deck.remove((int)(Math.random() * deck.size()));
