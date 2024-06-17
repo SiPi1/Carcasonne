@@ -89,7 +89,7 @@ public class Carcassonne {
                 rotate(in, tile);
                 System.out.println(tile);
 
-                addedMeeples = addMeeple(in, tile, p);//TODO: Move after placing??
+                addedMeeples = addMeeple(in, tile, p);
                 System.out.println(tile);
 
                 System.out.println("Where would you like to place your tile?");

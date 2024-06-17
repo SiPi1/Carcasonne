@@ -104,10 +104,10 @@ public class Board {
 
     private ArrayList<Tile> elementAt(int x, int y, int side, ArrayList<Tile> remainder) {
         if (!board.get(x).get(y).getCityConnect() || !board.get(x).get(y).getRoadConnect() ) {
+            int count = 0;//counts tiles tracked by activeSides
             for (Tile t: remainder) {
-                int count = 0;
                 if (t == board.get(x).get(y) && activeSides.get(count) == side) {
-                    return remainder;
+                    return remainder;//ONLY if remainder already contains this tile AND this side do we not keep iterating
                 }
                 if (!t.getCityConnect() || !t.getRoadConnect()) count++;
             }
@@ -126,8 +126,15 @@ public class Board {
                 default:     x1 = x;       y1 = y + 1;
             }
             remainder.add(board.get(x).get(y));
-            return elementAt(x1, y1, (side + 2) % 4, remainder);
-        }
+            if (board.get(x).get(y).getSideType(side) == board.get(x).get(y).getSideType(side)) {//if this side is the type we seek
+                if (board.get(x1).get(y1).getSideType((side + 2) % 4) == board.get(x).get(y).getSideType(side)) {//if the next tile's type matches
+                    remainder = elementAt(x1, y1, (side + 2) % 4, remainder);//find the element of the next tile
+                }
+                else if (!exists(x1, y1)) {
+                    remainder.add(board.get(x1).get(y1));
+                }//mark unfinished element
+            }
+        }//CONDITIONS HERE ARE WRONG - continued on empty tile (they were actually nonexistant lmao. I put them in)
 
         if (remainder.contains(board.get(x).get(y))) return remainder;
         remainder.add(board.get(x).get(y));
@@ -180,10 +187,11 @@ public class Board {
         
         if (tile.getCityConnect() || tile.getRoadConnect()) {
             for (int i = 0; i < 4; i++) {
-                if (tile.getSideColor(i) >= 0) 
+                if (tile.getSideColor(i) > 0) 
                     check[tile.getSideType(i)] = true;
             }
-        }
+        }//find side types with meeples
+
         for (int i = 0; i < 4; i++) {
             int x1, y1;
             switch(i) {
@@ -203,7 +211,7 @@ public class Board {
                     return i + 1;
                 }//side type mismatch
 
-                if (tile.getSide(i) > 1 && check[tile.getSideType(i)]) {
+                if ((tile.getSide(i) > -1 && check[tile.getSideType(i)]) || tile.getSide(i) > 1) {//Changed - hopefully is no longer problematic?
                     for (Tile t: elementAt(x1, y1, (i + 2) % 4)) {
                         if (!t.getCityConnect() || !t.getRoadConnect()) {
                             int j;

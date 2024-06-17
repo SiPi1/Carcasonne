@@ -7,6 +7,7 @@ public class Input {
         this.b = null;
         this.s = null;
     }
+
     public Input(Board b, Scoreboard s) {
         this.s = s;
         this.b = b;
@@ -31,13 +32,23 @@ public class Input {
     }
 
     private void help(String userIn) {
-        switch(userIn) {
+        switch(userIn.toUpperCase()) {
             case "HELP":
-                System.out.println("Help function: input SAVE and copy result to clipboard to save.");//TODO: Add functions: highlight element?
+                System.out.println("--RULES--\nEverything moves counterclockwise.\n\n" 
+                + "--COMMANDS--\nSAVE: Copy the printed text and paste when you next run the program to save.\nRULES: View the full Carcasonne rules.\n"
+                + "DARKBORDERS or LIGHBORDERS: Set the color of the piece borders.\n");
                 break;
             case "SAVE":
                 System.out.println(s.save() + "|" + b.save());
                 break;
+            case "RULES":
+                System.out.println("Look them up bozo I cant be bothered to write them here...");
+            case "DARKBORDERS":
+                Tile.BORDER = "\u001B[30m";
+                System.out.print("Done: ");
+            case "LIGHTBORDERS":
+                Tile.BORDER = "";
+                System.out.print("Done: ");
             default:
                 System.out.print("Please input a number: ");
         }

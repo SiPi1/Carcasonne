@@ -3,6 +3,7 @@
  *
  * @author Robert Leoni
  * @version 6-5-24
+ * TODO: Should rotation go clockwise and be by which side goes on top? And, should print() label the sides?
  */
 public class Tile implements Cloneable
 {
@@ -11,6 +12,7 @@ public class Tile implements Cloneable
     private boolean fortified;
     private int monastery;
     private boolean roadConnects;
+    public static String BORDER = "\u001B[30m";
 
     public Tile(){
         for (int i = 0; i < 4; i++) {
@@ -49,7 +51,7 @@ public class Tile implements Cloneable
             }
             save = save.substring(2);
         }
-        
+
         cityConnects = true;
         if (save.length() > 0)
         switch (save.charAt(0)) {
@@ -120,11 +122,11 @@ public class Tile implements Cloneable
     public void rotate(int rotates){
         int hold;
         for (int i = rotates; i > 0; i--){
-            hold = sides[0];
-            sides[0] = sides[1];
-            sides[1] = sides[2];
-            sides[2] = sides[3];
-            sides[3] = hold;
+            hold = sides[3];
+            sides[3] = sides[2];
+            sides[2] = sides[1];
+            sides[1] = sides[0];
+            sides[0] = hold;
         }
     }
     
@@ -166,19 +168,19 @@ public class Tile implements Cloneable
             else 
                 l1 = "\u001B[" + (30 + getSideColor(1)) + "m" + getSideColor(1) + "\u001B[0m";;
 
-            ln += l1 + " " + t + "" + t1 + "|";
+            ln += l1 + " " + t + "" + t1 + BORDER + "|\u001B[0m";
             break;
 
 
             case 1:
-            char r, m, f, l;
-            String m1;
+            char m, f, l;
+            String m1, r;
             if (sides[3] == -1) 
-                r = '|';
+                r = BORDER + "|\u001B[0m";
             else if (sides[3] % 2 == 0) 
-                r = '=';
+                r = "=";
             else
-                r = '(';
+                r = "(";
 
             if (sides[1] == -1) 
                 l = ' ';
@@ -209,25 +211,25 @@ public class Tile implements Cloneable
 
 
             case 2:
-            char d;
-            String d1, r1;
+            String d, d1, r1;
 
             if (sides[2] == -1) 
-                d = '-';
+                d = BORDER + "-\u001B[0m";
             else if (sides[2] % 2 == 0) 
-                d = 9553;
+                d = "" + (char)9553;
             else 
-                d = '∩';
-            if (sides[2] / 2 < 1)
-                d1 = "-";
+                d = "∩";
 
+            if (sides[2] / 2 < 1)
+                d1 = BORDER + "-\u001B[0m";
             else 
                 d1 = "\u001B[" + (30 + getSideColor(2)) + "m" + getSideColor(2) + "\u001B[0m";
+
             if (sides[3] / 2 < 1)
-                r1 = "-";
+                r1 = BORDER + "-\u001B[0m";
             else 
                 r1 = "\u001B[" + (30 + getSideColor(3)) + "m" + getSideColor(3) + "\u001B[0m";
-            ln += " " + d1 + d + "-" + r1;
+            ln += BORDER + "-\u001B[0m" + d1 + d + BORDER + "-\u001B[0m" + r1;
         }
         return ln;
     }
@@ -237,7 +239,7 @@ public class Tile implements Cloneable
     }
 
     public String save() {
-        if (sides[0] == -2) return "00";
+        if (sides[0] == -2) return "0";
         String save = "";
         for (int i: sides) {
             if (i < 10 && i >= 0) save += '0';
