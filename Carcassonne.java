@@ -3,23 +3,35 @@
 * Write a description of class Carcasonne here.
 *
 * @author Miles
-* @version 6/5/24
+* TODO: OH BOY CURSOR MOVEMENTS 
 */
 import java.util.*;
 
 public class Carcassonne {
+    public static void ansiTable() {
+        int width = 10;
+        for (int i = 0; i < 110; i += width) {
+            for (int j = 0; j < width; j++) {
+                String color = "\u001B[" + (i+j) + "m";
+                if (i+j < 10) color += " A";
+                else if (i+j < 100) color += " ";
+                System.out.print(color + (i+j) + "\u001B[0m");
+            }
+            System.out.println();
+        }
+    }
     public static void asciiTable() {
         int width = 5;
         for (int i = 0; i < 10000; i += width) {
             for (int j = 0; j < width; j++) {
-                if ((char)(i + j) != '?') System.out.print("\t" + (i + j) + " : " + (char)(i + j));
+                System.out.print("\t" + (i + j) + " : " + (char)(i + j));
             }
             System.out.println();
         }
     }
     public static void main(String[] args) {
 
-        Input in = new Input();
+        IO in = new IO();
         Board board;
         Deck deck;
         Scoreboard scores;
@@ -61,7 +73,7 @@ public class Carcassonne {
             competitors = getPlayers(in);
             scores = new Scoreboard(competitors);
         }
-        in = new Input(board, scores);
+        in = new IO(board, scores);
 
         // LOOP VARIABLES
         int temp;
@@ -77,7 +89,7 @@ public class Carcassonne {
             competitors.add(p);
             addedMeeples = 0;
 
-            System.out.println("\n\nPlayer " + p.getNumber() + ": " + p.getName() + "'s turn!\n"
+            System.out.println(IO.color(p.getNumber()) + "\n\nPlayer " + p.getNumber() + ": " + p.getName() + "'s turn!\n" + IO.RESET
                     + board
                     + tile.getKey()
                     + "\nYour tile: \n" + tile);
@@ -92,7 +104,7 @@ public class Carcassonne {
                 addedMeeples = addMeeple(in, tile, p);
                 System.out.println(tile);
 
-                System.out.println("Where would you like to place your tile?");
+                System.out.print("Place your tile: ");
                 temp = in.nextInt();
                 while (temp > 0 && board.placeTile(temp, tile) != 0) {
                     System.out.println(
@@ -126,13 +138,13 @@ public class Carcassonne {
         System.out.println(board + "\n" + scores + "Congratulations " + winner.getName() + ", you won!");
     }
 
-    private static ArrayList<Player> getPlayers(Input in) {
+    private static ArrayList<Player> getPlayers(IO in) {
         String name = " ";
         ArrayList<Player> players = new ArrayList<Player>();
 
         System.out.println("Enter your names, [enter] to finish:");
         for (int i = 0; i < 2 || !name.equals(""); i++) {
-            System.out.print("Player " + (i + 1) + ": ");
+            System.out.print(IO.color(i + 1) + "Player " + (i + 1) + ": ");
             name = in.nextLine();
             if (name.equals("")) i--;
             else if (name.indexOf('|') != -1 || name.indexOf('=') != -1 || name.indexOf(';') != -1) {
@@ -144,18 +156,18 @@ public class Carcassonne {
         return players;
     }
 
-    private static void rotate(Input in, Tile tile) {
+    private static void rotate(IO in, Tile tile) {
         int temp;
-        System.out.print("ROTATE TILE -- 0:0 deg, 1:90 deg, 2:180 deg, 3: 270 deg: ");
+        System.out.print("Which side should be on top? Enter 1-4: ");
         temp = in.nextInt();
-        while (temp > 3 || temp < 0) {
+        while (temp > 4 || temp < 0) {
             System.out.println("Please input between 0-3.");
             temp = in.nextInt();
         }
         tile.rotate(temp);
     }
 
-    private static int addMeeple(Input in, Tile tile, Player player) {
+    private static int addMeeple(IO in, Tile tile, Player player) {
         int side;
         System.out.print("You have " + player.getMeeples() + " meeples.\nClaim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
         side = in.nextInt() - 1;

@@ -2,7 +2,6 @@
  * Creates a Tile object that can be added to the Carcossonne board.
  *
  * @author Robert Leoni
- * @version 6-5-24
  * TODO: Should rotation go clockwise and be by which side goes on top? And, should print() label the sides?
  */
 public class Tile implements Cloneable
@@ -12,7 +11,6 @@ public class Tile implements Cloneable
     private boolean fortified;
     private int monastery;
     private boolean roadConnects;
-    public static String BORDER = "\u001B[30m";
 
     public Tile(){
         for (int i = 0; i < 4; i++) {
@@ -121,12 +119,12 @@ public class Tile implements Cloneable
     
     public void rotate(int rotates){
         int hold;
-        for (int i = rotates; i > 0; i--){
-            hold = sides[3];
-            sides[3] = sides[2];
-            sides[2] = sides[1];
-            sides[1] = sides[0];
-            sides[0] = hold;
+        for (int i = rotates-1; i > 0; i--){
+            hold = sides[0];
+            sides[0] = sides[1];
+            sides[1] = sides[2];
+            sides[2] = sides[3];
+            sides[3] = hold;
         }
     }
     
@@ -161,14 +159,14 @@ public class Tile implements Cloneable
             if (sides[0] / 2 < 1)
                 t1 = " ";
             else 
-                t1 = "\u001B[" + (30 + getSideColor(0)) + "m" + getSideColor(0) + "\u001B[0m";
+                t1 = IO.color(getSideColor(0)) + getSideColor(0) + IO.RESET;
 
             if (sides[1] / 2 < 1)
-                l1 = "·";
+                l1 = IO.color(0) + "·" + IO.RESET;
             else 
-                l1 = "\u001B[" + (30 + getSideColor(1)) + "m" + getSideColor(1) + "\u001B[0m";;
+                l1 = IO.color(getSideColor(1)) + getSideColor(1) + IO.RESET;
 
-            ln += l1 + " " + t + "" + t1 + BORDER + "|\u001B[0m";
+            ln += l1 + " " + t + "" + t1 + IO.color(0) + "|" + IO.RESET;
             break;
 
 
@@ -176,7 +174,7 @@ public class Tile implements Cloneable
             char m, f, l;
             String m1, r;
             if (sides[3] == -1) 
-                r = BORDER + "|\u001B[0m";
+                r = IO.color(0) + "|" + IO.RESET;
             else if (sides[3] % 2 == 0) 
                 r = "=";
             else
@@ -202,7 +200,7 @@ public class Tile implements Cloneable
                 m = ' ';
 
             if (monastery > 0)
-                m1 = "\u001B[" + (30 + monastery) + "m" +  monastery + "\u001B[0m";
+                m1 = IO.color(monastery) +  monastery + "" + IO.RESET;
             else 
                 m1 = " ";
 
@@ -214,28 +212,28 @@ public class Tile implements Cloneable
             String d, d1, r1;
 
             if (sides[2] == -1) 
-                d = BORDER + "-\u001B[0m";
+                d = IO.color(0) + "-" + IO.RESET;
             else if (sides[2] % 2 == 0) 
                 d = "" + (char)9553;
             else 
                 d = "∩";
 
             if (sides[2] / 2 < 1)
-                d1 = BORDER + "-\u001B[0m";
+                d1 = IO.color(0) + "-" + IO.RESET;
             else 
-                d1 = "\u001B[" + (30 + getSideColor(2)) + "m" + getSideColor(2) + "\u001B[0m";
+                d1 = IO.color(getSideColor(2)) + getSideColor(2) + "" + IO.RESET;
 
             if (sides[3] / 2 < 1)
-                r1 = BORDER + "-\u001B[0m";
+                r1 = IO.color(0) + "-" + IO.RESET;
             else 
-                r1 = "\u001B[" + (30 + getSideColor(3)) + "m" + getSideColor(3) + "\u001B[0m";
-            ln += BORDER + "-\u001B[0m" + d1 + d + BORDER + "-\u001B[0m" + r1;
+                r1 = IO.color(getSideColor(3)) + getSideColor(3) + "" + IO.RESET;
+            ln += IO.color(0) + "-" + IO.RESET + d1 + d + IO.color(0) + "-" + IO.RESET + r1;
         }
         return ln;
     }
     
     public String toString(){
-        return toString(0) + "\n" + toString(1) + "\n" + toString(2) + "\n";
+        return "    1   \n  " + toString(0) + "\n2 " + toString(1) + " 4\n  " + toString(2) + "\n    3     ";
     }
 
     public String save() {

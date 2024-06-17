@@ -2,7 +2,6 @@
  * This wil create the Player object which saves data related to the player
  * 
  * @author Robert Leoni
- * @version 5-24-2024
  */
 public class Player{
     

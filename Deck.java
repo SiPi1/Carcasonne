@@ -2,7 +2,6 @@
  * A deck of tiles
  * 
  * @author Silas W
- * @version 6-3-24
  */
 
  import java.util.ArrayList;

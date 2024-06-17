@@ -2,7 +2,6 @@
  * Write a description of class Scoreboard here.
  *
  * @author Miles
- * @version 6/5/24
  */
 import java.util.*;
 public class Scoreboard
