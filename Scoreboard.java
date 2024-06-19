@@ -33,9 +33,9 @@ public class Scoreboard
     public String toString() {
         String print = "The scores are: \n";
         for (int i = 0; i < scores.size(); i++) {
-            print += names.get(i) + ", " + scores.get(i) + "\n";
+            print += names.get(i) + ": " + scores.get(i) + "\t";
         }
-        return print;
+        return print + "\n";
     }
 
     public void score (ArrayList<Integer> newScores) {

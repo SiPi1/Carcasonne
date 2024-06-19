@@ -5,6 +5,7 @@ public class IO {
     private static String BORDER = "\u001B[30m";
     private static String BRIGHT = ";1";
     private static int[] playerColor;
+    public static int lines = 0;
 
     Board b;
     Scoreboard s;
@@ -30,13 +31,18 @@ public class IO {
     
     public int nextInt() {
         String userIn = in.nextLine();
-        try {
-            return Integer.parseInt(userIn);
+        int ret;
+        if (userIn.equals("")) ret = 0;
+        else try {
+            ret = Integer.parseInt(userIn);
         }
         catch (NumberFormatException e) {
             help(userIn);
             return nextInt();
         }
+        System.out.print("\u001B[" + lines + "A\u001B[0J");
+        lines = 0;
+        return ret;
     }
 
     public String nextLine() {
@@ -44,19 +50,24 @@ public class IO {
     }
 
     private void help(String userIn) {
+        System.out.print("\u001B[" + lines + "A\u001B[0J");
+        lines = 0;
         switch(userIn.toUpperCase()) {
             case "HELP":
-                System.out.println("--RULES--\nEverything moves counterclockwise.\n\n" 
+                System.out.println("--RULES--\nEverything moves counterclockwise.\nIf you press enter enough times, everything will be okay.\n\n" 
                 + "--COMMANDS--\nSAVE: Copy the printed text and paste when you next run the program to save.\nRULES: View the full Carcasonne rules.\n"
                 + "DB or LB: Set the color of the piece borders.\n"
                 + "DC or LC: Set the brightness of meeples and player colors.\n"
                 + "KEY: Displays a key for the board.");
+                lines += 11;
                 break;
             case "SAVE":
                 System.out.println(s.save() + "|" + b.save());
+                lines += 2;
                 break;
             case "RULES":
                 System.out.println("Look them up bozo I cant be bothered to write them here...");
+                lines++;
                 break;
             case "DB":
                 BORDER = "";
@@ -71,13 +82,15 @@ public class IO {
                 BRIGHT = ";1";
                 break;
             case "KEY":
-                System.out.print(Tile.getKey());
+                System.out.println(Tile.getKey());
+                lines += 9;
                 break;
             case "BOARD":
                 System.out.println(b);
                 break;
             default:
                 System.out.print("Please input a number: ");
+                lines++;
         }
     }
 }

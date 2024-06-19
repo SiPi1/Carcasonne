@@ -3,7 +3,6 @@
 * Write a description of class Carcasonne here.
 *
 * @author Miles
-* TODO: OH BOY CURSOR MOVEMENTS 
 */
 import java.util.*;
 
@@ -38,7 +37,7 @@ public class Carcassonne {
         ArrayList<Player> competitors;
         Player winner;
         String userIn;
-        
+        System.out.print("\u001B[2J\u001B[1;0H");
         System.out.println("WELCOME TO CARCASONNE! \nPlay from save? ");
         userIn = in.nextLine();
         if (!userIn.equals("")) {
@@ -94,25 +93,25 @@ public class Carcassonne {
 
             System.out.println(IO.color(p.getNumber()) + "\n\nPlayer " + p.getNumber() + ": " + p.getName() + "'s turn!\n" + IO.RESET
                     + board
-                    + "\nYour tile: \n" + tile);
+                    + scores);
 
             while (temp == 0) { //while loop to reset tile placement
                 p.setMeeples(addedMeeples);
                 for (int i = 0; i < 4; i++) tile.setSideColor(i, 0);
 
                 rotate(in, tile);
-                System.out.println(tile);
 
-                addedMeeples = addMeeple(in, tile, p);
-                System.out.println(tile);
+                if (p.getMeeples() > 0) addedMeeples = addMeeple(in, tile, p);
 
-                System.out.print("Place your tile: ");
+                System.out.print(tile + "Place your tile: ");
                 temp = in.nextInt();
                 while (temp > 0 && board.placeTile(temp, tile) != 0) {
-                    System.out.println(
-                            "That placement is invalid, try again: " + invalidPlacement(board.placeTile(temp, tile)));
+                    System.out.print("\u001B[0J" + //clear previous line
+                            "That placement is invalid, try again: " + 
+                            invalidPlacement(board.placeTile(temp, tile)));
                     temp = in.nextInt();
                 }
+                System.out.println("\u001B[6A\u001B[0J");
             }
             System.out.println(board);
 
@@ -121,7 +120,9 @@ public class Carcassonne {
                 if (board.meeplesBack().size() > pl.getNumber() - 1) 
                     pl.setMeeples(board.meeplesBack().get(pl.getNumber() - 1));
             }
-            System.out.print("Your turn is over. " + scores);
+            //CLEAR SCREEN            
+            System.out.print("\u001B[" + (5 + competitors.size()) + ";0H");
+            System.out.print("\u001B[0J");
         }
 
         //GAME END
@@ -150,7 +151,7 @@ public class Carcassonne {
             name = in.nextLine();
             if (name.equals("")) i--;
             else if (name.indexOf('|') != -1 || name.indexOf('=') != -1 || name.indexOf(';') != -1) {
-                System.out.println("Names can't contain =, |, or ;");
+                System.out.println("\u001B[1A\u001B[0J" + "Names can't contain =, |, or ;");
                 i--;
             }
             else players.add(new Player(name));
@@ -160,26 +161,29 @@ public class Carcassonne {
 
     private static void rotate(IO in, Tile tile) {
         int temp;
-        System.out.print("Which side should be on top? Enter 1-4: ");
+        System.out.print(tile + "Which side should be on top? Enter 0-4: ");
         temp = in.nextInt();
         while (temp > 4 || temp < 0) {
-            System.out.println("Please input between 0-3.");
+            System.out.print("\u001B[0J" + "Please input between 0-4: ");
             temp = in.nextInt();
         }
         tile.rotate(temp);
+        System.out.print("\u001B[5A\u001B[0J");
+        
     }
 
     private static int addMeeple(IO in, Tile tile, Player player) {
         int side;
-        System.out.print("You have " + player.getMeeples() + " meeples.\nClaim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
+        System.out.print(tile + "You have " + player.getMeeples() + " meeples.\nClaim this tile? Enter a side (1-4) to place a meeple, or 0 not to: ");
         side = in.nextInt() - 1;
         while (!checkMeeple(side, tile).equals("")) {
-            System.out.print(checkMeeple(side, tile));
+            System.out.print("\u001B[0J" + checkMeeple(side, tile));
             side = in.nextInt() - 1;
         }
-        if (side == -1)
+        if (side == -1) {
+            System.out.print("\u001B[6A\u001B[0J");
             return 0;
-
+        }
         player.setMeeples(-1);
 
         if (tile.getSide(side) == -1)
@@ -187,19 +191,19 @@ public class Carcassonne {
         else
             tile.setSideColor(side, player.getNumber());
 
+        System.out.print("\u001B[6A\u001B[0J");
         return 1;
     }
 
     private static String checkMeeple(int side, Tile tile) {
 
         if (side < -1 || side > 3)
-            return "Please input between 0-4.";
-        if (side > -1 && tile.getSide(side) == -1) {
-            if (tile.getMonastery() == 0)
-                return "";
-            else
-                return "Sorry, we don't do farmers...";
-        }
+            return "Please input between 0-4: ";
+        if (side > -1 
+            && tile.getSide(side) == -1
+            && tile.getMonastery() != 0)
+                return "Sorry, we don't do farmers... ";
+        
         return "";
     }
 

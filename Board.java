@@ -113,8 +113,7 @@ public class Board {
             int count = 0;// counts tiles tracked by activeSides
             for (Tile t : remainder) {
                 if (t == board.get(x).get(y) && activeSides.get(count) == side) {
-                    return remainder;// ONLY if remainder already contains this tile AND this side do we not keep
-                                     // iterating
+                    return remainder;// ONLY if remainder already contains this tile AND side do we stop
                 }
                 if (!t.getCityConnect() || !t.getRoadConnect())
                     count++;
@@ -202,6 +201,7 @@ public class Board {
                 } // checks for empty tile that is printed in toString as a placeable tile
             }
         }
+        if (x == board.size() && y == board.get(0).size()) return -1;
         x -= 1;
         y -= 1;
         lastX = x;
