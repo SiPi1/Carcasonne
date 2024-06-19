@@ -8,7 +8,9 @@ public class Scoreboard
 {
     private ArrayList<Integer> scores;
     private ArrayList<String> names;
-    public Scoreboard (ArrayList<Player> n) {
+    long saveSeed;
+    public Scoreboard (ArrayList<Player> n, long seed) {
+        saveSeed = seed;
         scores = new ArrayList<Integer>();
         names = new ArrayList<String>();
         for (Player p: n) {
@@ -17,7 +19,8 @@ public class Scoreboard
         }
     }
 
-    public Scoreboard (String save) {
+    public Scoreboard (String save, long seed) {
+        saveSeed = seed;
         scores = new ArrayList<Integer>();
         names = new ArrayList<String>();
         while (!save.equals("")) {
@@ -52,7 +55,7 @@ public class Scoreboard
     }
 
     public String save() {
-        String save = "";
+        String save = saveSeed + "|";
         for (int i = 0; i < names.size(); i++) {
             save += names.get(i) + "=" + scores.get(i) + ";";
         }

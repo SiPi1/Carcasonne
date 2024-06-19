@@ -142,21 +142,14 @@ public class Board {
                     y1 = y + 1;
             }
             remainder.add(board.get(x).get(y));
-            if (board.get(x).get(y).getSideType(side) == board.get(x).get(y).getSideType(side)) {// if this side is the
-                                                                                                 // type we seek
-                if (board.get(x1).get(y1).getSideType((side + 2) % 4) == board.get(x).get(y).getSideType(side)) {// if
-                                                                                                                 // the
-                                                                                                                 // next
-                                                                                                                 // tile's
-                                                                                                                 // type
-                                                                                                                 // matches
-                    remainder = elementAt(x1, y1, (side + 2) % 4, remainder);// find the element of the next tile
+            if (board.get(x).get(y).getSideType(side) == board.get(x).get(y).getSideType(side)) {// see below
+                if (board.get(x1).get(y1).getSideType((side + 2) % 4) == board.get(x).get(y).getSideType(side)) {
+                    elementAt(x1, y1, (side + 2) % 4, remainder);// find the element of the next tile
                 } else if (!exists(x1, y1)) {
                     remainder.add(board.get(x1).get(y1));
-                } // mark unfinished element
+                } 
             }
-        } // CONDITIONS HERE ARE WRONG - continued on empty tile (they were actually
-          // nonexistant lmao. I put them in)
+        } 
 
         if (remainder.contains(board.get(x).get(y)))
             return remainder;
@@ -184,19 +177,9 @@ public class Board {
                     x1 = x;
                     y1 = y + 1;
             }
-            // System.out.println(board.get(x1).get(y1)
-            // +"\n"+board.get(x).get(y).getSideType(side) +"\n"+
-            // board.get(x).get(y).getSideType(i) +"\n"+
-            // board.get(x1).get(y1).getSideType((side + 2) % 4) +"\n"+
-            // board.get(x).get(y).getSideType(side));
-            if (board.get(x).get(y).getSideType(side) == board.get(x).get(y).getSideType(i)) {// if this side is the
-                                                                                              // type we seek
-                if (board.get(x1).get(y1).getSideType((i + 2) % 4) == board.get(x).get(y).getSideType(side)) {// if the
-                                                                                                              // next
-                                                                                                              // tile's
-                                                                                                              // type
-                                                                                                              // matches
-                    remainder = elementAt(x1, y1, (i + 2) % 4, remainder);// find the element of the next tile
+            if (board.get(x).get(y).getSideType(side) == board.get(x).get(y).getSideType(i)) {// if this side is the type we seek
+                if (board.get(x1).get(y1).getSideType((i + 2) % 4) == board.get(x).get(y).getSideType(side)) {// if the next tile's type matches
+                    elementAt(x1, y1, (i + 2) % 4, remainder);// find the element of the next tile
                 } else if (!exists(x1, y1)) {
                     remainder.add(board.get(x1).get(y1));
                 } // mark unfinished element
@@ -341,7 +324,7 @@ public class Board {
         for (int i = 0; i < 4; i++) {
             ArrayList<Tile> toScore = elementAt(lastX, lastY, i);
             ArrayList<ArrayList<Integer>> results;
-            if (isFinished(toScore)) {
+            if (isFinished(toScore) && board.get(lastX).get(lastY).getSide(i) >= 0) {
                 results = scoreElement(toScore, board.get(lastX).get(lastY).getSideType(i));
                 for (int p = 0; p < results.get(0).size(); p++) {
                     if (scores.size() == p) {
@@ -371,7 +354,7 @@ public class Board {
                 if (exists(r, c) && board.get(r).get(c).getMonastery() > NO_PLAYER) {
                     ArrayList<Tile> toScore;
                     ArrayList<ArrayList<Integer>> results;
-                    
+
                     if (board.get(r).get(c).getSideType(0) == GRASS)
                         toScore = elementAt(r, c, 0);
                     else
@@ -450,23 +433,27 @@ public class Board {
     private ArrayList<ArrayList<Integer>> scoreElement(ArrayList<Tile> element, int type) {
         ArrayList<Integer> score = new ArrayList<Integer>();
         ArrayList<Integer> meeples = new ArrayList<Integer>();
-        // System.out.println("Scored! " + type);
-        for (int i = 0; i < element.size(); i++) {
-            if (element.get(i).getSide(TOP) == -2) {
-                element.remove(i);
-                i--;
-            }
-        } // we dont care abt end pieces at this point
-        int total = element.size();
+        System.out.println("Scored! " + type);
+        while (element.remove(null));//removes all nullpieces?
 
-        for (Tile t : element) {
-            if (type == 3 && t.getMonastery() > NO_PLAYER) {
-                while (t.getMonastery() > meeples.size()) {
+        // for (int i = 0; i < element.size(); i++) {
+        //     if (element.get(i).getSide(TOP) == -2) {
+        //         element.remove(i);
+        //         i--;
+        //     }
+        // } // we dont care abt end pieces at this point 
+        int total = element.size();
+        if (type == 3 && total == 9) {
+            if (element.get(4).getMonastery() > NO_PLAYER) {
+                while (element.get(4).getMonastery() > meeples.size()) {
                     meeples.add(0);
                 } // account for flexible player number
-                meeples.set(t.getMonastery() - 1, meeples.get(t.getMonastery() - 1) + 1);
-                t.setMonastery(NO_PLAYER);
-            } else if (!t.getCityConnect() || !t.getRoadConnect()) {
+                meeples.set(element.get(4).getMonastery() - 1, meeples.get(element.get(4).getMonastery() - 1) + 1);
+                element.get(4).setMonastery(NO_PLAYER);
+            }
+        }
+        else for (Tile t : element) {
+            if (!t.getCityConnect() || !t.getRoadConnect()) {
                 int i = activeSides.remove(0);
                 if (t.getSideType(i) == type && t.getSideColor(i) != NO_PLAYER) {
                     while (t.getSideColor(i) > meeples.size()) {

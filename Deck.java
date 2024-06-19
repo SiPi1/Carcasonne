@@ -5,6 +5,7 @@
  */
 
  import java.util.ArrayList;
+import java.util.Random;
 
  public class Deck {
      private ArrayList<Tile> deck;
@@ -12,9 +13,11 @@
      final int GRASS = -1;
      final int ROAD = 0;
      final int CITY = 1;
+     Random r;
  
-     public Deck() {//https://cf.geekdo-images.com/fICWo6RHTkWWWgc532J1mg__medium/img/A5mjaanVRn7Gj6TC8hZWuvDatSU=/fit-in/5ROADROADx5ROADROAD/filters:no_upscale():strip_icc()/pic115467.jpg
-         deck = new ArrayList<Tile>();
+     public Deck(long seed) {//https://cf.geekdo-images.com/fICWo6RHTkWWWgc532J1mg__medium/img/A5mjaanVRn7Gj6TC8hZWuvDatSU=/fit-in/5ROADROADx5ROADROAD/filters:no_upscale():strip_icc()/pic115467.jpg
+        r = new Random(seed); 
+        deck = new ArrayList<Tile>();
          for (int i = 0; i < 9; i++) {
              switch(i) {
                  case 8://Singletons
@@ -59,19 +62,32 @@
          }
      }
 
-    public Deck(Board b) {
-        this();
+    public Deck(Board b, long seed) {
+        this(seed);
+        ArrayList<Tile> problems = new ArrayList<Tile>();
         deck.add(new Tile(CITY, ROAD, GRASS, ROAD, true, false, -1));//account for start tile
         for (Tile t: b.tiles()) {
-            deck.remove(t);
+            for (int i = 0; i < deck.size(); i++) {
+                if (deck.get(i).equals(t)) {
+                    deck.remove(i);
+                    r.nextInt(deck.size());//cycle the seed
+                    break;
+                }
+                if (i == deck.size() - 1) 
+                    problems.add(t);
+
+            }
         }
+        if (deck.size() != 68 - b.tiles().size()) System.out.print("PARSE ERROR: DECK OFF BY " + problems);
     }
      
      public Tile draw() {
-         return deck.remove((int)(Math.random() * deck.size()));
+        if (empty()) return new Tile();
+        return deck.remove(r.nextInt(deck.size()));
      }
      
      public boolean empty() {
          return deck.size() == 0;
      }
+     
  }

@@ -42,9 +42,11 @@ public class Carcassonne {
         System.out.println("WELCOME TO CARCASONNE! \nPlay from save? ");
         userIn = in.nextLine();
         if (!userIn.equals("")) {
+            int seed = Integer.parseInt(userIn.substring(0, userIn.indexOf('|')));
+            userIn = userIn.substring(userIn.indexOf('|') + 1);
             board = new Board(userIn.substring(userIn.indexOf('|') + 1));
-            deck = new Deck(board);
-            scores = new Scoreboard(userIn.substring(0, userIn.indexOf('|')));
+            deck = new Deck(board, seed);
+            scores = new Scoreboard(userIn.substring(0, userIn.indexOf('|')), seed);
             competitors = new ArrayList<Player>();
             for (String name: scores.getPlayers()) {
                 competitors.add(new Player(name));
@@ -68,10 +70,11 @@ public class Carcassonne {
             }
         }
         else {
+            int seed = (int)System.currentTimeMillis();
             board = new Board();
-            deck = new Deck();
+            deck = new Deck(seed);
             competitors = getPlayers(in);
-            scores = new Scoreboard(competitors);
+            scores = new Scoreboard(competitors, seed);
         }
         in = new IO(board, scores);
 
@@ -91,7 +94,6 @@ public class Carcassonne {
 
             System.out.println(IO.color(p.getNumber()) + "\n\nPlayer " + p.getNumber() + ": " + p.getName() + "'s turn!\n" + IO.RESET
                     + board
-                    + tile.getKey()
                     + "\nYour tile: \n" + tile);
 
             while (temp == 0) { //while loop to reset tile placement

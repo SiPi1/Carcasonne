@@ -27,10 +27,6 @@ public class IO {
         if (playerColor == null) return "\u001B[" + (30 + player) + BRIGHT + "m";
         return "\u001B[" + playerColor[player-1] + BRIGHT + "m";
     }
-
-    public void setScoreboard(Scoreboard s) {
-        this.s = s;
-    }
     
     public int nextInt() {
         String userIn = in.nextLine();
@@ -52,8 +48,9 @@ public class IO {
             case "HELP":
                 System.out.println("--RULES--\nEverything moves counterclockwise.\n\n" 
                 + "--COMMANDS--\nSAVE: Copy the printed text and paste when you next run the program to save.\nRULES: View the full Carcasonne rules.\n"
-                + "DARKBORDERS or LIGHBORDERS: Set the color of the piece borders.\n"
-                + "DARKCOLORS or LIGHCOLORS: Set the brightness of meeples and player colors.\n");
+                + "DB or LB: Set the color of the piece borders.\n"
+                + "DC or LC: Set the brightness of meeples and player colors.\n"
+                + "KEY: Displays a key for the board.");
                 break;
             case "SAVE":
                 System.out.println(s.save() + "|" + b.save());
@@ -61,21 +58,20 @@ public class IO {
             case "RULES":
                 System.out.println("Look them up bozo I cant be bothered to write them here...");
                 break;
-            case "DARKBORDERS":
-                BORDER = "\u001B[30m";
-                System.out.print("Done: ");
-                break;
-            case "LIGHTBORDERS":
+            case "DB":
                 BORDER = "";
-                System.out.print("Done: ");
                 break;
-            case "DARKCOLORS":
-                BRIGHT = ";1";
-                System.out.print("Done: ");
+            case "LB":
+                BORDER = "\u001B[30m";
                 break;
-            case "LIGHTCOLORS":
+            case "DC":
                 BRIGHT = "";
-                System.out.print("Done: ");
+                break;
+            case "LC":
+                BRIGHT = ";1";
+                break;
+            case "KEY":
+                System.out.print(Tile.getKey());
                 break;
             case "BOARD":
                 System.out.println(b);
